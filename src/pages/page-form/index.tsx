@@ -8,7 +8,6 @@ import {
   ContainerCardCompra,
   ContainerCardInformacoesDoProduto,
   ContainerCardPagamento,
-  ContainerForm,
   ContainerInputsMesmaLinha,
   ContainerTitleCard,
   ConteinerSection,
@@ -58,7 +57,6 @@ import { useNavigate } from "react-router-dom";
 export function Form() {
   const [cafes, setCafes] = useState<any[]>([]);
   const [dadosForm, setDadosForm] = useState(DataForm);
-  const [atualizandoDados, setAtualizandoDados] = useState<any>([]);
   const [valorCafe, setValorCafe] = useState(JSON.parse(localStorage.getItem("valor-cafe") || ""));
   const [valorTotalCafe, setValorTotalCafe] = useState(0)
   const [totalCarinho, setTotalCarinho] = useState<number>(JSON.parse(localStorage.getItem("total-carinho") || ""));
@@ -114,7 +112,6 @@ export function Form() {
       dados = dadosForm.uf
       newObject = dadosForm
     }
-    setAtualizandoDados(newObject)
     localStorage.setItem("dados-form", JSON.stringify(newObject))
   }
 
