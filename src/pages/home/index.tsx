@@ -28,6 +28,8 @@ import Arabe from "../../img/arabe.svg"
 import Irlandes from "../../img/irlandes.svg"
 import { ContainerPosicaoCards } from "../../components/coffe/styled";
 
+import DadosForm from "../../mock/dataForm.json"
+
 export function Home() {
   const [cafes, setCafes] = useState<any[]>([]);
     const [quantidadeCarinho, setQuantidadeCarinho] = useState<number>(0);
@@ -77,20 +79,23 @@ const getCurrentImage = (img: string) => {
 }
 
 useEffect(() => {
-  if (localStorage.getItem("total-carinho") == null) {
-      var total = 0;
+  var total = 0;
+  if (localStorage.getItem("total-carinho") == null) {    
       localStorage.setItem("total-carinho", JSON.stringify(total));
   }
-
+  localStorage.setItem("total-carinho", JSON.stringify(total));
+  let valorCafes= 0
   if (localStorage.getItem("valor-cafe") == null) {
-      let valorCafes = 0
       localStorage.setItem("valor-cafe", JSON.stringify(valorCafes))
   }
+  localStorage.setItem("valor-cafe", JSON.stringify(valorCafes))
 
-  if (localStorage.getItem("coffe-delivery") == null) {
-      const meusCafes = MyCoffes
+  const meusCafes = MyCoffes
+  if (localStorage.getItem("coffe-delivery") == null) {      
       localStorage.setItem("coffe-delivery", JSON.stringify(meusCafes));
   }
+  localStorage.setItem("coffe-delivery", JSON.stringify(meusCafes));
+  localStorage.setItem("dados-form", JSON.stringify(DadosForm));
 
   setCafes(JSON.parse(localStorage.getItem("coffe-delivery") || ""));
 }, []);

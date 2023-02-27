@@ -5,7 +5,7 @@ import { Form } from './pages/page-form'
 
 export function Router() {
     return(
-      <Routes>
+      <Routes>    
         <Route path="/" element={<Home />} />    
         <Route path="/form" element={<Form />} />
         <Route path="/entrega" element={<Entrega />} />

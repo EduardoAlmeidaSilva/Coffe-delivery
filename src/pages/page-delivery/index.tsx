@@ -5,7 +5,7 @@ import Relogio from '../../img/relogio.svg'
 import Cifrao from '../../img/cifrao-entrega.svg'
 import Moto from '../../img/moto-entrega.svg'
 import { BackgroundFazendoBorder, CardsInformacoes, ContainerCardsInformacoes, ContainerPage, ContainerTitlePage, ParagrafoCardInformacao, SubtitlePage, TitlePage } from "./styled";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function Entrega() {
   const [dadosCadastro, setDadosCadastroForm] = useState<any>(JSON.parse(localStorage.getItem("dados-form") || ''));

@@ -27,6 +27,9 @@ import {
   TitleSection,
   InputsFormCpf,
 } from "./styled";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import localizacao from "../../img/localizacao-form.svg";
 import Cifrao from "../../img/cifrao.svg";
 import CartaoDebito from "../../img/cartao-debito.svg";
@@ -35,6 +38,7 @@ import Dinheiro from "../../img/dinheiro.svg";
 import { CardCarinho } from "../../components/card-cart";
 import { useEffect, useState } from "react";
 import DataForm from "../../mock/dataForm.json"
+import UfForm from "../../mock/uf.json"
 import { addQtdCafeUtil, formatMoney, removeQtdCafeUtil } from "../../utils/CoffesCalcs";
 
 import ExpressoTradicional from "../../img/expresso-tradicional.svg"
@@ -57,6 +61,7 @@ import { useNavigate } from "react-router-dom";
 export function Form() {
   const [cafes, setCafes] = useState<any[]>([]);
   const [dadosForm, setDadosForm] = useState(DataForm);
+  const [ufForm, setUfForm] = useState(UfForm);
   const [valorCafe, setValorCafe] = useState(JSON.parse(localStorage.getItem("valor-cafe") || ""));
   const [valorTotalCafe, setValorTotalCafe] = useState(0)
   const [totalCarinho, setTotalCarinho] = useState<number>(JSON.parse(localStorage.getItem("total-carinho") || ""));
@@ -78,14 +83,14 @@ export function Form() {
     localStorage.setItem("forma-pagamento", JSON.stringify(formasPagamentos))
   }
 
-  function setandoValor(event: React.ChangeEvent<HTMLInputElement>) {
+  function setandoValor(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     var newObject = {}
     var dados = ""
     if (event.target.id == "cep") {
       dadosForm.cep = event.target.value
       dados = dadosForm.cep
       newObject = dadosForm
-      
+
     } else if (event.target.id == "rua") {
       dadosForm.rua = event.target.value
       dados = dadosForm.rua
@@ -114,8 +119,6 @@ export function Form() {
     }
     localStorage.setItem("dados-form", JSON.stringify(newObject))
   }
-
-
 
   useEffect(() => {
     if (localStorage.getItem("valor-cafe")) {
@@ -209,26 +212,57 @@ export function Form() {
     }
   }
   const navigate = useNavigate()
-  const handleSubmit = () => {
-
-    if (formaPagamento === "") {
-      return alert("Informe o método de pagamento")
-    }
-
-    if (valorCafe === 0) {
-      return alert("Coloque Algum produto no carrinho")
-    }
+  function handleSubmit() {
 
     if (dadosForm.cep == "") {
-      return alert("Cadastre seu cep")
+      return (
+        toast.error('Informe seu CEP')
+      )
+    } else if (dadosForm.rua == "") {
+      return (
+        toast.error('Informe sua RUA')
+      )
+    } else if (dadosForm.numero == "") {
+      return (
+        toast.error('Informe seu NUMERO')
+      )
+    } else if (dadosForm.bairo == "") {
+      return (
+        toast.error('Informe sua BAIRO')
+      )
+    } else if (dadosForm.cidade == "") {
+      return (
+        toast.error('Informe sua CIDADE')
+      )
+    } else if (dadosForm.uf == "") {
+      return (
+        toast.error('selecione seu ESTADO')
+      )
+    } else if (totalCarinho === 0) {
+      return (
+        toast.error('Coloque algum item no CARRINHO')
+      )
+    } else if (formaPagamento === "") {
+      return (
+        toast.error('Informe a forma de PAGAMENTO')
+      )
+    } else if (valorCafe === 0) {
+      return (
+        toast.error('Coloque algum café no CARRINHO')
+      )
+    } else {
+      const newArray: any[] = [];
+      cafes.map((cafe) => {
+        cafe.qtd = 0
+        newArray.push(cafe)
+      })
+      let zerandoCarinho = totalCarinho
+      zerandoCarinho = 0
+      localStorage.setItem("total-carinho", JSON.stringify(zerandoCarinho));
+      localStorage.setItem("coffe-delivery", JSON.stringify(newArray));
+      toast.success('Pedido Realizado!')
+      navigate("/entrega")
     }
-    if (dadosForm.cep == "") {
-      alert("Cadastre o cep para continuar")
-    }
-
-    alert("Pedido realizado!!")
-    return navigate("/entrega")
-
 
   }
 
@@ -236,152 +270,152 @@ export function Form() {
     <ConfigGerais>
       <Header />
 
-      <form onSubmit={() => handleSubmit()}>
-        <ConteinerSection>
-          <div>
-            <TitleSection>Complete seu pedido</TitleSection>
 
+      <ConteinerSection>
+        <div>
+          <TitleSection>Complete seu pedido</TitleSection>
+          <ContainerCard>
+            <div>
+              <ContainerTitleCard>
+                <img src={localizacao} alt="" />
+                <TitleCards>Endereço de Entrega</TitleCards>
+              </ContainerTitleCard>
+              <SubtitleCards>
+                Informe o endereço onde deseja receber seu pedido
+              </SubtitleCards>
+            </div>
 
+            <InputsFormCpf
+              placeholder="CEP *"
+              id="cep"
+              onChange={setandoValor}
+              mask="99999-999"
+            />
 
-            <ContainerCard>
-              <div>
-                <ContainerTitleCard>
-                  <img src={localizacao} alt="" />
-                  <TitleCards>Endereço de Entrega</TitleCards>
-                </ContainerTitleCard>
-                <SubtitleCards>
-                  Informe o endereço onde deseja receber seu pedido
-                </SubtitleCards>
-              </div>
+            <InputsFormRua
+              type="text"
+              placeholder="Rua *"
+              id="rua"
+              onChange={setandoValor}
+            />
 
-              <InputsFormCpf
-                placeholder="CEP"
-                id="cep"
-
+            <ContainerInputsMesmaLinha>
+              <InputsFormNumero
+                type="number"
+                placeholder="Número *"
+                id="numero"
                 onChange={setandoValor}
-                mask="99999-999"
               />
 
-              <InputsFormRua
+              <InputsFormComplemento
                 type="text"
-                placeholder="Rua"
-                id="rua"
-                required
+                placeholder="Complemento"
+                id="complemento"
                 onChange={setandoValor}
               />
 
-              <ContainerInputsMesmaLinha>
-                <InputsFormNumero
-                  type="number"
-                  placeholder="Número"
-                  id="numero"
-                  required
-                  onChange={setandoValor}
-                />
-                <InputsFormComplemento
-                  type="text"
-                  placeholder="Complemento *"
-                  id="complemento"
-                  onChange={setandoValor}
-                />
-              </ContainerInputsMesmaLinha>
+            </ContainerInputsMesmaLinha>
 
-              <ContainerInputsMesmaLinha>
-                <InputsFormBairro
-                  type="text"
-                  placeholder="Bairo"
-                  id="bairo"
-                  required
-                  onChange={setandoValor}
-                />
-                <InputsFormCidade
-                  type="text"
-                  placeholder="cidade"
-                  id="cidade"
-                  required
-                  onChange={setandoValor}
-                />
-                <InputsFormUf
-                  type="text"
-                  placeholder="UF"
-                  id="uf"
-                  maxLength={2}
-                  required
-                  onChange={setandoValor}
-                />
-              </ContainerInputsMesmaLinha>
-            </ContainerCard>
+            <ContainerInputsMesmaLinha>
+              <InputsFormBairro
+                type="text"
+                placeholder="Bairo *"
+                id="bairo"
+                onChange={setandoValor}
+              />
 
-            <ContainerCardPagamento>
-              <div>
-                <ContainerTitleCard>
-                  <img src={Cifrao} alt="" />
-                  <TitleCards>Pagamento</TitleCards>
-                </ContainerTitleCard>
-                <SubtitleCards>
-                  O pagamento é feito na entrega. Escolha a forma que deseja pagar
-                </SubtitleCards>
-              </div>
+              <InputsFormCidade
+                type="text"
+                placeholder="cidade *"
+                id="cidade"
+                onChange={setandoValor}
+              />
 
-              <ContainerButtonPagamento>
-                <ButtonPagamento type="button" className={`${mudarCor == "Cartao de crédito" ? "active" : ""}`} onClick={() => pagamento('cartaoCredito')} >
-                  <img src={CartaoCredito} alt="" />
-                  CARTÃO DE CRÉDITO
-                </ButtonPagamento>
-                <ButtonPagamento type="button" className={`${mudarCor == "Cartao de débito" ? "active" : ""}`} onClick={() => pagamento('cartaoDebito')}>
-                  <img src={CartaoDebito} alt="" />
-                  CARTÃO DE DÉBITO
-                </ButtonPagamento>
-                <ButtonPagamento type="button" className={`${mudarCor == "Dinheiro" ? "active" : ""}`} onClick={() => pagamento('dinheiro')}>
-                  <img src={Dinheiro} alt="" />
-                  DINHEIRO
-                </ButtonPagamento>
-              </ContainerButtonPagamento>
-            </ContainerCardPagamento>
-          </div>
-
-          <ContainerCardInformacoesDoProduto>
-            <TitleSection>Cafés selecionados</TitleSection>
-            <ContainerCardCompra>
-              {cafes?.map((cafe: any, index: number) => {
-
-
-                if (cafe.qtd > 0) {
+              <InputsFormUf
+                id="uf"
+                onChange={setandoValor}
+              >
+                <option disabled selected hidden>UF *</option>
+                {ufForm.uf.map((ufs: any) => {
                   return (
-                    <CardCarinho
-                      nameCoffe={cafe.nomeCafe}
-                      quantidadeCoffe={cafe.qtd}
-                      myIndex={index}
-                      addQtdCafe={addQtdCafe}
-                      removeQtdCafe={removeQtdCafe}
-                      removerCard={removerCard}
-                      getCurrentImage={getCurrentImage(cafe.imgCafe)}
-                      refreshValue={(total: number) => { setValorCafe(total), setValorTotalCafe(total) }} />
+                    <option value={ufs}>{ufs}</option>
                   )
-                }
-              })}
-              <div>
-                <InformacoesPrecoCompra>
-                  <ParagrafoPrecoCompra>Total de itens</ParagrafoPrecoCompra>
-                  <ParagrafoValorCompra>{formatMoney(valorCafe)}</ParagrafoValorCompra>
-                </InformacoesPrecoCompra>
-                <InformacoesPrecoCompra>
-                  <ParagrafoPrecoCompra>Entrega</ParagrafoPrecoCompra>
-                  <ParagrafoValorCompra>R$ 3,50</ParagrafoValorCompra>
-                </InformacoesPrecoCompra>
-                <InformacoesPrecoCompra>
-                  <ParagrafoTotalCompra>Total</ParagrafoTotalCompra>
-                  <ParagrafoValorTotalCompra>{formatMoney(valorCafe + 3.50)}</ParagrafoValorTotalCompra>
-                </InformacoesPrecoCompra>
-                <ButtonConfirmarPedido type="submit">CONFIRMAR PEDIDO</ButtonConfirmarPedido>
+                })}
+              </InputsFormUf>
 
-              </div>
-            </ContainerCardCompra>
-          </ContainerCardInformacoesDoProduto>
+            </ContainerInputsMesmaLinha>
+          </ContainerCard>
+
+          <ContainerCardPagamento>
+            <div>
+              <ContainerTitleCard>
+                <img src={Cifrao} alt="" />
+                <TitleCards>Pagamento</TitleCards>
+              </ContainerTitleCard>
+              <SubtitleCards>
+                O pagamento é feito na entrega. Escolha a forma que deseja pagar
+              </SubtitleCards>
+            </div>
+
+            <ContainerButtonPagamento>
+              <ButtonPagamento type="button" className={`${mudarCor == "Cartao de crédito" ? "active" : ""}`} onClick={() => pagamento('cartaoCredito')} >
+                <img src={CartaoCredito} alt="" />
+                CARTÃO DE CRÉDITO
+              </ButtonPagamento>
+              <ButtonPagamento type="button" className={`${mudarCor == "Cartao de débito" ? "active" : ""}`} onClick={() => pagamento('cartaoDebito')}>
+                <img src={CartaoDebito} alt="" />
+                CARTÃO DE DÉBITO
+              </ButtonPagamento>
+              <ButtonPagamento type="button" className={`${mudarCor == "Dinheiro" ? "active" : ""}`} onClick={() => pagamento('dinheiro')}>
+                <img src={Dinheiro} alt="" />
+                DINHEIRO
+              </ButtonPagamento>
+            </ContainerButtonPagamento>
+
+          </ContainerCardPagamento>
+        </div>
+
+        <ContainerCardInformacoesDoProduto>
+          <TitleSection>Cafés selecionados</TitleSection>
+          <ContainerCardCompra>
+            {cafes?.map((cafe: any, index: number) => {
 
 
-        </ConteinerSection>
-      </form>
+              if (cafe.qtd > 0) {
+                return (
+                  <CardCarinho
+                    nameCoffe={cafe.nomeCafe}
+                    quantidadeCoffe={cafe.qtd}
+                    myIndex={index}
+                    addQtdCafe={addQtdCafe}
+                    removeQtdCafe={removeQtdCafe}
+                    removerCard={removerCard}
+                    getCurrentImage={getCurrentImage(cafe.imgCafe)}
+                    refreshValue={(total: number) => { setValorCafe(total), setValorTotalCafe(total) }} />
+                )
+              }
+            })}
+
+            <div>
+              <InformacoesPrecoCompra>
+                <ParagrafoPrecoCompra>Total de itens</ParagrafoPrecoCompra>
+                <ParagrafoValorCompra>{formatMoney(valorCafe)}</ParagrafoValorCompra>
+              </InformacoesPrecoCompra>
+              <InformacoesPrecoCompra>
+                <ParagrafoPrecoCompra>Entrega</ParagrafoPrecoCompra>
+                <ParagrafoValorCompra>R$ 3,50</ParagrafoValorCompra>
+              </InformacoesPrecoCompra>
+              <InformacoesPrecoCompra>
+                <ParagrafoTotalCompra>Total</ParagrafoTotalCompra>
+                <ParagrafoValorTotalCompra>{formatMoney(valorCafe + 3.50)}</ParagrafoValorTotalCompra>
+              </InformacoesPrecoCompra>
+              <ButtonConfirmarPedido type="button" onClick={handleSubmit}>CONFIRMAR PEDIDO</ButtonConfirmarPedido>
+
+            </div>
+          </ContainerCardCompra>
+        </ContainerCardInformacoesDoProduto>
+      </ConteinerSection>
+
     </ConfigGerais >
   );
 }

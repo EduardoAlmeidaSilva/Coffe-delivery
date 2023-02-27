@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import ReactInputMask from "react-input-mask";
-
 export const TitleSection = styled.p`
   font-family: "Baloo 2", cursive;
   font-style: normal;
@@ -167,9 +166,9 @@ export const InputsFormCidade = styled.input`
   color: var(--base-label);
 `;
 
-export const InputsFormUf = styled.input`
-  width: 60px;
-  height: 42px;
+export const InputsFormUf = styled.select`
+  width: 85px;
+  height: 66px;
   border-radius: 4px;
   border: 1px solid var(--base-button);
   background-color: var(--base-input);
